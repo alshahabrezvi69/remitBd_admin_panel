@@ -47,3 +47,4 @@ Customer Configuration is managed under System & Governance. Administrators can 
 ## Deployment checklist
 
 Before opening the portal to staff, verify that the backend `/health` endpoint returns HTTP 200, the backend reports MongoDB connected, the portal build contains the intended HTTPS API origin, the first administrator can sign in, and Customer Configuration can be read and updated. Use the backend runbook for MongoDB backups, secret rotation, audit retention, rate limiting, and production monitoring.
+# remitBd_admin_panel
