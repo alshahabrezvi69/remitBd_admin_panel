@@ -1,0 +1,6 @@
+{
+  "name": "RemitBD Admin Portal",
+  "description": "Unified RemitBD remittance platform featuring a responsive web-based Admin Panel and Customer Portal powered by a shared secure backend API, double-entry ledger, and real-time transaction workflows.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
