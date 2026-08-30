@@ -107,8 +107,8 @@ export const TransfersView: React.FC<TransfersViewProps> = ({
     { value: 'REFUNDED', label: 'Refunded' },
   ];
 
-  const currencies: Currency[] = ['SAR', 'AED', 'QAR', 'KWD', 'OMR', 'MYR', 'SGD', 'BHD', 'MVR', 'EUR'];
-  const payoutMethods = ['ALL', 'BKASH', 'NAGAD', 'ROCKET', 'BANK_ACCOUNT'];
+  const currencies: Currency[] = ['SAR', 'AED', 'QAR', 'KWD', 'OMR', 'MYR', 'SGD', 'BHD', 'MVR', 'EUR', 'USD', 'GBP', 'BDT'];
+  const payoutMethods = ['ALL', 'BKASH', 'NAGAD', 'ROCKET', 'BANK', 'BANK_TRANSFER'];
 
   return (
     <div className="space-y-6">
@@ -255,7 +255,9 @@ export const TransfersView: React.FC<TransfersViewProps> = ({
                       <div className="font-mono font-bold text-emerald-600 text-sm">
                         ৳ {asNumber(tx.bdtAmount).toLocaleString()} BDT
                       </div>
-                      <div className="text-[10px] font-mono text-slate-500">{tx.payoutMethod}</div>
+                      <div className="text-[10px] font-mono text-slate-500">
+                        {tx.payoutMethod}{tx.bankName ? ` (${tx.bankName})` : ''}
+                      </div>
                     </td>
                     <td className="py-3.5 px-4">
                       <div className="font-semibold text-slate-800">{tx.recipientName}</div>

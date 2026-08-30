@@ -103,7 +103,7 @@ export const DepositsView: React.FC<DepositsViewProps> = ({
     { value: 'REFUNDED', label: 'Refunded' },
   ];
 
-  const currencies: Currency[] = ['SAR', 'AED', 'QAR', 'KWD', 'OMR', 'MYR', 'SGD', 'BHD', 'MVR', 'EUR'];
+  const currencies: Currency[] = ['SAR', 'AED', 'QAR', 'KWD', 'OMR', 'MYR', 'SGD', 'BHD', 'MVR', 'EUR', 'USD', 'GBP', 'BDT'];
 
   return (
     <div className="space-y-6">

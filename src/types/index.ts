@@ -9,7 +9,10 @@ export type Currency =
   | 'BHD' 
   | 'MVR' 
   | 'EUR' 
-  | 'BDT';
+  | 'USD' 
+  | 'GBP' 
+  | 'BDT'
+  | string;
 
 export type AdminRole = 
   | 'SUPER_ADMIN' 
@@ -43,7 +46,7 @@ export type TransferStatus =
   | 'REFUND_PENDING' 
   | 'REFUNDED';
 
-export type PayoutMethod = 'BKASH' | 'NAGAD' | 'ROCKET' | 'BANK_TRANSFER';
+export type PayoutMethod = 'BKASH' | 'NAGAD' | 'ROCKET' | 'BANK' | 'BANK_TRANSFER' | string;
 
 export type LedgerTransactionType = 
   | 'DEPOSIT' 
