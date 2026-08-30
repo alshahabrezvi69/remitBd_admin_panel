@@ -13,6 +13,39 @@ import {
 
 export type AnyRecord = Record<string, any>;
 
+export const getApiBaseUrl = (): string => {
+  const custom = typeof window !== 'undefined' ? localStorage.getItem('remitbd_api_base_url') : null;
+  if (custom && custom.trim()) {
+    return custom.trim().replace(/\/+$/, '');
+  }
+  const envUrl = (import.meta.env.VITE_API_BASE_URL || '').trim();
+  if (envUrl) {
+    return envUrl.replace(/\/+$/, '');
+  }
+  return '';
+};
+
+export const setCustomApiBaseUrl = (url: string | null): void => {
+  if (typeof window === 'undefined') return;
+  if (!url || !url.trim()) {
+    localStorage.removeItem('remitbd_api_base_url');
+  } else {
+    localStorage.setItem('remitbd_api_base_url', url.trim().replace(/\/+$/, ''));
+  }
+};
+
+export const apiUrl = (path: string): string => {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  const base = getApiBaseUrl();
+  return base ? `${base}${cleanPath}` : cleanPath;
+};
+
+export const apiFetch = (input: string, init?: RequestInit): Promise<Response> => {
+  return fetch(apiUrl(input), init);
+};
+
 export const asString = (value: unknown, fallback = ''): string => {
   if (value === null || value === undefined) return fallback;
   return String(value);
