@@ -158,6 +158,13 @@ export const UserManagementView: React.FC<UserManagementViewProps> = ({
     else if (action === 'reject') endpoint = `/api/admin/users/${selectedUser.id}/reject`;
     else if (action === 'suspend') endpoint = `/api/admin/users/${selectedUser.id}/suspend`;
 
+    const isDedicatedVerifyEndpoint = action === 'verify' || action === 'reject' || action === 'suspend';
+    // Dedicated endpoints (verify/reject/suspend) expect {note?} - NOT {action}. Sending action causes 422.
+    // Generic /action endpoint expects {action, note}
+    const payload: Record<string, string> = isDedicatedVerifyEndpoint
+      ? (actionReason?.trim() ? { note: actionReason.trim() } : {})
+      : { action, ...(actionReason?.trim() ? { note: actionReason.trim() } : { note: actionReason || '' }) };
+
     try {
       const res = await apiFetch(endpoint, {
         method: 'POST',
@@ -165,7 +172,7 @@ export const UserManagementView: React.FC<UserManagementViewProps> = ({
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ action: action === 'verify' || action === 'reject' || action === 'suspend' ? undefined : action, note: actionReason }),
+        body: JSON.stringify(payload),
       });
 
       const json = await res.json().catch(() => ({}));
