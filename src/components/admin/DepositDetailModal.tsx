@@ -232,21 +232,26 @@ export const DepositDetailModal: React.FC<DepositDetailModalProps> = ({
             <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl">
               <div className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">Ledger &amp; Financial Posting</div>
               <div className="flex items-center gap-1.5 mt-2">
-                <span
-                  className={`text-xs font-mono px-2 py-0.5 rounded font-bold ${
-                    deposit.ledgerStatus === 'POSTED'
-                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                      : deposit.ledgerStatus === 'REVERSED'
-                      ? 'bg-purple-50 text-purple-700 border border-purple-200'
-                      : 'bg-slate-100 text-slate-700 border border-slate-200'
-                  }`}
-                >
-                  LEDGER: {deposit.ledgerStatus}
+                <span className="text-xs font-mono px-2 py-0.5 rounded font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                  LEDGER: PENDING
                 </span>
               </div>
               <div className="text-[11px] text-slate-500 mt-1">
-                Payment: <span className="font-semibold text-slate-800">{deposit.paymentStatus}</span>
+                Payment: <span className="font-bold text-slate-800">AWAITING_VERIFICATION</span>
               </div>
+              <div className="text-[11px] text-slate-500 mt-1.5">
+                Payment Reference: <span className="font-mono font-bold text-slate-900">{deposit.reference}</span>
+              </div>
+              {deposit.providerReference && (
+                <div className="text-[11px] text-slate-500 mt-0.5">
+                  Provider Ref: <span className="font-mono font-semibold text-slate-700">{deposit.providerReference}</span>
+                </div>
+              )}
+              {deposit.customerTrxId && (
+                <div className="text-[11px] text-slate-500 mt-0.5">
+                  Customer Trx ID: <span className="font-mono font-semibold text-slate-700">{deposit.customerTrxId}</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -255,7 +260,7 @@ export const DepositDetailModal: React.FC<DepositDetailModalProps> = ({
             <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl">
               <div className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">
                 <UserIcon className="w-4 h-4 text-blue-600" />
-                <span>Customer Information</span>
+                <span className="font-extrabold text-slate-900">Sender (Customer)</span>
               </div>
               <div className="space-y-1.5 text-xs">
                 <div className="flex justify-between">

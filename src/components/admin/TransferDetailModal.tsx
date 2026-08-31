@@ -221,6 +221,32 @@ export const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
             </div>
           </div>
 
+          {/* Ledger & Financial Posting */}
+          <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl">
+            <div className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">Ledger &amp; Financial Posting</div>
+            <div className="flex items-center gap-1.5 mt-2">
+              <span className="text-xs font-mono px-2 py-0.5 rounded font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                LEDGER: PENDING
+              </span>
+            </div>
+            <div className="text-[11px] text-slate-500 mt-1">
+              Payment: <span className="font-bold text-slate-800">AWAITING_VERIFICATION</span>
+            </div>
+            <div className="text-[11px] text-slate-500 mt-1.5">
+              Payment Reference: <span className="font-mono font-bold text-slate-900">{transfer.payoutReference || transfer.providerReference || transfer.id}</span>
+            </div>
+            {transfer.providerReference && transfer.providerReference !== transfer.payoutReference && (
+              <div className="text-[11px] text-slate-500 mt-0.5">
+                Provider Ref: <span className="font-mono font-semibold text-slate-700">{transfer.providerReference}</span>
+              </div>
+            )}
+            {transfer.ledgerTransactionId && (
+              <div className="text-[11px] text-slate-500 mt-0.5">
+                Ledger Txn ID: <span className="font-mono font-semibold text-slate-700">{transfer.ledgerTransactionId}</span>
+              </div>
+            )}
+          </div>
+
           {/* Risk & Compliance Screening Box */}
           <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl">
             <div className="flex items-center justify-between mb-3">
@@ -261,7 +287,7 @@ export const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
             <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl">
               <div className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">
                 <UserIcon className="w-4 h-4 text-blue-600" />
-                <span>Sender (Customer)</span>
+                <span className="font-extrabold text-slate-900">Sender (Customer)</span>
               </div>
               <div className="space-y-1.5 text-xs">
                 <div className="flex justify-between">
