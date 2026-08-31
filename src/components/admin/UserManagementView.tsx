@@ -53,6 +53,9 @@ export const UserManagementView: React.FC<UserManagementViewProps> = ({
   const [actionModal, setActionModal] = useState<{ action: string; title: string } | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'transactions' | 'recipients' | 'audit'>('overview');
+  const [resetPinModal, setResetPinModal] = useState(false);
+  const [newPin, setNewPin] = useState('');
+  const [resetPinLoading, setResetPinLoading] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -100,6 +103,7 @@ export const UserManagementView: React.FC<UserManagementViewProps> = ({
         recipients: Array.isArray(json.recipients) ? json.recipients : [],
         auditLogs: Array.isArray(json.auditLogs) ? json.auditLogs : [],
         stats: json.stats || {},
+        pinInfo: json.pinInfo || { pinSet: false, biometricEnabled: false, lastLogin: null },
       });
     } catch (err) {
       console.error(err);
@@ -116,6 +120,34 @@ export const UserManagementView: React.FC<UserManagementViewProps> = ({
       if (user) handleInspectUser(user);
     }
   }, [selectedUserId, users, handleInspectUser]);
+
+  const handleResetPin = async () => {
+    if (!selectedUser || newPin.length !== 4 || !/^\d{4}$/.test(newPin)) return;
+    setResetPinLoading(true);
+    try {
+      const res = await apiFetch(`/api/admin/users/${selectedUser.id}/reset-pin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ new_pin: newPin, note: 'Admin PIN reset' }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setFeedback('PIN reset successfully. New PIN: ' + newPin);
+        setResetPinModal(false);
+        setNewPin('');
+        handleInspectUser(selectedUser);
+      } else {
+        setFeedback(readApiError(json, 'PIN reset failed.'));
+      }
+    } catch {
+      setFeedback('Network error during PIN reset.');
+    } finally {
+      setResetPinLoading(false);
+    }
+  };
 
   const handleExecuteUserAction = async (action: string) => {
     if (!selectedUser) return;
@@ -439,7 +471,22 @@ export const UserManagementView: React.FC<UserManagementViewProps> = ({
                       <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-bold uppercase mb-1">
                         <Key className="w-3 h-3" /> PIN Status
                       </div>
-                      <div className="text-xs font-bold text-emerald-600">Set (4-digit)</div>
+                      {userProfile?.pinInfo?.pinSet ? (
+                        <div className="flex items-center gap-2">
+                          <div className="text-lg font-mono font-bold text-slate-900 tracking-[0.2em] bg-white border border-slate-200 px-3 py-1 rounded-lg">
+                            {userProfile?.pinInfo?.pinRaw || '****'}
+                          </div>
+                          <span className="text-[10px] text-emerald-600 font-bold">SET</span>
+                        </div>
+                      ) : (
+                        <div className="text-xs font-bold text-rose-600">No PIN Set</div>
+                      )}
+                      {userProfile?.pinInfo?.biometricEnabled && (
+                        <div className="text-[10px] text-blue-500 mt-1">Biometric Enabled</div>
+                      )}
+                      {userProfile?.pinInfo?.lastLogin && (
+                        <div className="text-[10px] text-slate-400 mt-1">Last Login: {new Date(userProfile.pinInfo.lastLogin).toLocaleDateString()}</div>
+                      )}
                     </div>
                     <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl">
                       <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-bold uppercase mb-1">
@@ -700,12 +747,60 @@ export const UserManagementView: React.FC<UserManagementViewProps> = ({
                   </div>
                 </div>
               )}
+
+              {/* PIN Reset Modal */}
+              {resetPinModal && (
+                <div className="p-4 bg-slate-50 border border-blue-300 rounded-xl space-y-3 shadow-inner">
+                  <div className="text-xs font-bold text-blue-800 uppercase tracking-wider">
+                    Reset User PIN
+                  </div>
+                  <p className="text-[11px] text-slate-600">
+                    Enter a new 4-digit PIN for this user. The user will need to use this new PIN to log in and authorize transactions.
+                  </p>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                      New 4-Digit PIN
+                    </label>
+                    <input
+                      type="text"
+                      maxLength={4}
+                      pattern="[0-9]{4}"
+                      value={newPin}
+                      onChange={(e) => setNewPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                      placeholder="e.g. 1234"
+                      className="w-40 bg-white border border-slate-300 rounded-lg p-2.5 text-xs font-mono font-bold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-center tracking-[0.3em]"
+                    />
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => { setResetPinModal(false); setNewPin(''); }}
+                      className="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-200 rounded-lg"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleResetPin}
+                      disabled={newPin.length !== 4 || resetPinLoading}
+                      className="px-4 py-1.5 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {resetPinLoading ? 'Resetting...' : 'Reset PIN'}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Modal Actions Footer */}
             <div className="p-4 sm:p-5 border-t border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
-              <div className="text-xs text-slate-500">
-                Governance Actions
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-500">Governance Actions</span>
+                <button
+                  onClick={() => setResetPinModal(true)}
+                  className="px-3 py-1.5 text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 rounded-lg border border-slate-200 shadow-sm flex items-center gap-1.5 transition-colors"
+                >
+                  <Key className="w-3.5 h-3.5" />
+                  <span>Reset PIN</span>
+                </button>
               </div>
 
               <div className="flex flex-wrap gap-2">
