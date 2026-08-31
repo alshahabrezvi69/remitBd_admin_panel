@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Currency } from '../../types';
-import { normalizeTransfer, readApiError, asNumber, apiFetch } from '../../utils/api';
+import { normalizeTransfer, normalizeUser, readApiError, asNumber, apiFetch } from '../../utils/api';
 import {
   Users,
   UserCheck,
@@ -19,10 +19,13 @@ import {
   Layers,
   ChevronRight,
   ExternalLink,
+  Bell,
+  UserX,
+  Snowflake,
 } from 'lucide-react';
 
 interface DashboardMetrics {
-  users: { total: number; verified: number; pendingKyc: number; frozen: number; banned?: number };
+  users: { total: number; verified: number; pendingKyc: number; frozen: number; banned?: number; pendingVerification?: number; verifiedAccounts?: number; suspended?: number; rejected?: number };
   deposits: { todayCount: number; pending: number; completed: number; underReview: number };
   transfers: { todayCount: number; pending: number; completed: number; failed: number; refunds: number; inComplianceReview: number };
   currencyVolumes: Partial<Record<Currency, { depositVolume: number; transferVolume: number; pendingVolume: number }>>;
@@ -30,10 +33,14 @@ interface DashboardMetrics {
   recentTransfers: any[];
   recentDeposits: any[];
   recentAuditLogs: any[];
+  recentUsers: any[];
+  recentSendMoney: any[];
+  recentReceiveMoney: any[];
+  unreadNotifications: number;
 }
 
 const emptyDashboardMetrics: DashboardMetrics = {
-  users: { total: 0, verified: 0, pendingKyc: 0, frozen: 0, banned: 0 },
+  users: { total: 0, verified: 0, pendingKyc: 0, frozen: 0, banned: 0, pendingVerification: 0, verifiedAccounts: 0, suspended: 0, rejected: 0 },
   deposits: { todayCount: 0, pending: 0, completed: 0, underReview: 0 },
   transfers: { todayCount: 0, pending: 0, completed: 0, failed: 0, refunds: 0, inComplianceReview: 0 },
   currencyVolumes: {},
@@ -41,6 +48,10 @@ const emptyDashboardMetrics: DashboardMetrics = {
   recentTransfers: [],
   recentDeposits: [],
   recentAuditLogs: [],
+  recentUsers: [],
+  recentSendMoney: [],
+  recentReceiveMoney: [],
+  unreadNotifications: 0,
 };
 
 interface DashboardViewProps {
@@ -91,6 +102,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           : [],
         recentDeposits: Array.isArray(data.recentDeposits ?? data.recent_deposits) ? data.recentDeposits ?? data.recent_deposits : [],
         recentAuditLogs: Array.isArray(data.recentAuditLogs ?? data.recent_audit_logs) ? data.recentAuditLogs ?? data.recent_audit_logs : [],
+        recentUsers: Array.isArray(data.recentUsers ?? data.recent_users) ? (data.recentUsers ?? data.recent_users).map(normalizeUser) : [],
+        recentSendMoney: Array.isArray(data.recentSendMoney ?? data.recent_send_money) ? data.recentSendMoney ?? data.recent_send_money : [],
+        recentReceiveMoney: Array.isArray(data.recentReceiveMoney ?? data.recent_receive_money) ? data.recentReceiveMoney ?? data.recent_receive_money : [],
+        unreadNotifications: asNumber(data.unreadNotifications ?? data.unread_notifications),
       });
     } catch (err) {
       console.error(err);
@@ -156,7 +171,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       </div>
 
       {/* Primary KPI Metrics Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {/* User Card */}
         <div
           onClick={() => onNavigate('/admin/users')}
@@ -175,6 +190,27 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
             <span>KYC Review: <strong className="text-amber-600 font-bold">{currentMetrics.users.pendingKyc} pending</strong></span>
             <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
+          </div>
+        </div>
+
+        {/* Pending Verification Card */}
+        <div
+          onClick={() => onNavigate('/admin/users')}
+          className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-all cursor-pointer group"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Pending Verification</span>
+            <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+              <Clock className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="flex items-end gap-2 mt-2">
+            <div className="text-2xl font-bold text-amber-600">{currentMetrics.users.pendingVerification || 0}</div>
+            <div className="text-xs text-slate-500 font-medium mb-0.5">awaiting review</div>
+          </div>
+          <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+            <span>Suspended: <strong className="text-rose-600 font-bold">{currentMetrics.users.suspended || 0}</strong></span>
+            <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-600 group-hover:translate-x-0.5 transition-all" />
           </div>
         </div>
 
@@ -222,24 +258,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
         </div>
 
-        {/* Refunds & Exceptions Card */}
+        {/* Notifications Card */}
         <div
-          onClick={() => onNavigate('/admin/reconciliation')}
-          className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm hover:border-slate-300 transition-all cursor-pointer group"
+          className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm hover:border-violet-300 transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between">
-            <span className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Exceptions &amp; Rec</span>
-            <div className="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
-              <AlertOctagon className="w-4 h-4" />
+            <span className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Notifications</span>
+            <div className="w-7 h-7 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center">
+              <Bell className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-end gap-2 mt-2">
-            <div className="text-2xl font-bold text-rose-600">{currentMetrics.transfers.failed || 0}</div>
-            <div className="text-xs text-slate-500 font-medium mb-0.5">{currentMetrics.transfers.refunds} refunded</div>
+            <div className="text-2xl font-bold text-violet-600">{currentMetrics.unreadNotifications}</div>
+            <div className="text-xs text-slate-500 font-medium mb-0.5">unread</div>
           </div>
           <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
-            <span>Compliance hold: <strong className="text-slate-700 font-semibold">{currentMetrics.transfers.inComplianceReview}</strong></span>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
+            <span>Rejection rate: <strong className="text-rose-600 font-bold">{currentMetrics.users.rejected || 0} rejected</strong></span>
+            <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-violet-600 group-hover:translate-x-0.5 transition-all" />
           </div>
         </div>
       </div>
@@ -308,7 +343,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <table className="w-full text-left text-xs font-sans">
               <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold border-b border-slate-200">
                 <tr>
-                  <th className="px-4 py-2.5">ID / User</th>
+                  <th className="px-4 py-2.5">Transaction ID</th>
                   <th className="px-4 py-2.5">Amount</th>
                   <th className="px-4 py-2.5">Recipient</th>
                   <th className="px-4 py-2.5 text-right">Status</th>
@@ -364,28 +399,40 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="absolute inset-0 bg-gradient-to-br from-blue-900/15 to-transparent pointer-events-none"></div>
           <div className="px-4 py-3.5 border-b border-slate-800 bg-slate-900/70 flex items-center justify-between">
             <h3 className="text-xs font-bold text-white uppercase tracking-wider">
-              Server Audit Activity
+              Recent Registrations
             </h3>
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
-              <span className="text-[10px] font-mono text-blue-300 uppercase">Persisted</span>
+              <span className="text-[10px] font-mono text-blue-300 uppercase">Live</span>
             </div>
           </div>
 
           <div className="p-4 space-y-3 overflow-y-auto z-10 flex-1">
-            {currentMetrics.recentAuditLogs.length === 0 ? (
+            {currentMetrics.recentUsers.length === 0 ? (
               <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4 text-sm text-slate-400">
-                No audit events have been recorded yet.
+                No recent registrations.
               </div>
             ) : (
-              currentMetrics.recentAuditLogs.map((event: any) => (
-                <div key={event.id || event.timestamp} className="rounded-lg border border-slate-700 bg-slate-800/50 p-3">
+              currentMetrics.recentUsers.map((user: any) => (
+                <div key={user.id} className="rounded-lg border border-slate-700 bg-slate-800/50 p-3">
                   <div className="flex items-start justify-between gap-3">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-blue-300">{event.action || 'Audit event'}</span>
-                    <span className="text-[9px] text-slate-400 font-mono">{event.timestamp || event.created_at || ''}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-blue-300">
+                      {user.verificationStatus === 'PENDING' ? '⏳ PENDING' : user.verificationStatus === 'VERIFIED' ? '✅ VERIFIED' : user.verificationStatus || 'UNKNOWN'}
+                    </span>
+                    <span className="text-[9px] text-slate-400 font-mono">{user.createdAt || ''}</span>
                   </div>
-                  <div className="mt-1 text-sm font-semibold text-white">{event.resource_type || event.entity_type || 'System record'}</div>
-                  <div className="mt-1 text-xs text-slate-300">{event.reason || event.message || event.resource_id || ''}</div>
+                  <div className="mt-1 text-sm font-semibold text-white">{user.fullName || 'Unnamed'}</div>
+                  <div className="mt-1 text-xs text-slate-300">{user.phone} &bull; {user.id}</div>
+                  {user.verificationStatus === 'PENDING' && (
+                    <div className="mt-2">
+                      <button
+                        onClick={() => onNavigate('/admin/users')}
+                        className="text-[10px] font-bold text-amber-400 hover:text-amber-300 uppercase"
+                      >
+                        Review & Verify →
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))
             )}

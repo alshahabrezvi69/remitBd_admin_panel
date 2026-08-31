@@ -94,6 +94,9 @@ export const normalizeUser = (item: AnyRecord = {}): User => {
     Object.entries(balances && typeof balances === 'object' ? balances : {}).map(([key, amount]) => [key, asNumber(amount)])
   ) as Partial<Record<Currency, number>>;
   const name = asString(value(item, 'fullName', 'full_name'), 'Unnamed customer');
+  const accountStatus = asString(value(item, 'accountStatus', 'account_status'), 'ACTIVE') as User['accountStatus'];
+  const isBanned = asBoolean(value(item, 'isBanned', 'is_banned', accountStatus === 'BANNED'));
+  const verificationStatus = asString(value(item, 'verificationStatus', 'verification_status'), isBanned ? 'SUSPENDED' : accountStatus === 'ACTIVE' ? 'VERIFIED' : 'PENDING') as User['verificationStatus'];
   return {
     id: asString(item.id, 'unknown-user'),
     fullName: name,
@@ -103,14 +106,16 @@ export const normalizeUser = (item: AnyRecord = {}): User => {
     countryCode: asString(value(item, 'countryCode', 'country_code')),
     nativeCurrency: asString(value(item, 'nativeCurrency', 'native_currency'), 'SAR') as Currency,
     kycStatus: asString(value(item, 'kycStatus', 'kyc_status'), 'NOT_SUBMITTED') as User['kycStatus'],
-    accountStatus: asString(value(item, 'accountStatus', 'account_status'), 'ACTIVE') as User['accountStatus'],
+    accountStatus: accountStatus,
+    verificationStatus: verificationStatus,
     riskLevel: asString(value(item, 'riskLevel', 'risk_level'), 'LOW') as User['riskLevel'],
     balances: normalizedBalances,
     createdAt: asString(value(item, 'createdAt', 'created_at')),
+    updatedAt: asString(value(item, 'updatedAt', 'updated_at')),
     kycDocuments: Array.isArray(value(item, 'kycDocuments', 'kyc_documents')) ? value(item, 'kycDocuments', 'kyc_documents') : [],
     address: asString(item.address),
     occupation: asString(item.occupation),
-    isBanned: asBoolean(value(item, 'isBanned', 'is_banned', item.account_status === 'BANNED' || item.accountStatus === 'BANNED')),
+    isBanned: isBanned,
     banReason: asString(value(item, 'banReason', 'ban_reason')),
     bannedAt: asString(value(item, 'bannedAt', 'banned_at')),
   };

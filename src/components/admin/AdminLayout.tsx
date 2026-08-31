@@ -40,7 +40,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   children,
 }) => {
   const { admin, logout, switchRole } = useAuth();
-  const { notifications, unreadCount, markAsRead, markAllAsRead, activeToast, dismissToast } = useNotifications();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, activeToast, dismissToast, handleNotificationClick } = useNotifications();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
   const [roleSwitcherOpen, setRoleSwitcherOpen] = useState(false);
@@ -141,17 +141,20 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 flex overflow-hidden">
       {/* Real-time floating Notification Toast */}
       {activeToast && (
-        <div className="fixed bottom-6 right-6 z-50 max-w-sm w-full bg-white border border-slate-200 shadow-2xl rounded-xl p-4 flex items-start gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <div
+          onClick={() => handleNotificationClick(activeToast)}
+          className="fixed bottom-6 right-6 z-50 max-w-sm w-full bg-white border border-slate-200 shadow-2xl rounded-xl p-4 flex items-start gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300 cursor-pointer hover:border-blue-300 transition-colors"
+        >
           <div className="p-2 bg-blue-50 text-blue-600 rounded-lg flex-shrink-0">
             <Radio className="w-5 h-5 animate-pulse" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
               <h4 className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">
-                {activeToast.type.replace('_', ' ')}
+                {activeToast.type.replace(/_/g, ' ')}
               </h4>
               <button
-                onClick={dismissToast}
+                onClick={(e) => { e.stopPropagation(); dismissToast(); }}
                 className="text-slate-400 hover:text-slate-600 text-xs p-1"
               >
                 <X className="w-3.5 h-3.5" />
@@ -159,6 +162,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             </div>
             <p className="text-xs font-bold text-slate-900 mt-0.5">{activeToast.title}</p>
             <p className="text-xs text-slate-500 mt-0.5 truncate">{activeToast.message}</p>
+            {activeToast.transactionId && (
+              <p className="text-[10px] text-blue-500 font-mono mt-1">TX: {activeToast.transactionId}</p>
+            )}
           </div>
         </div>
       )}
@@ -325,13 +331,26 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                       notifications.map((n) => (
                         <div
                           key={n.id}
-                          onClick={() => markAsRead(n.id)}
+                          onClick={() => handleNotificationClick(n)}
                           className={`p-3 text-xs transition-colors cursor-pointer hover:bg-slate-50 ${
                             !n.read ? 'bg-blue-50/50' : ''
                           }`}
                         >
                           <div className="flex items-center justify-between mb-1">
-                            <span className="font-bold text-slate-900">{n.title}</span>
+                            <div className="flex items-center gap-1.5">
+                              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                                n.type.includes('VERIFIED') || n.type.includes('APPROVED') ? 'bg-emerald-100 text-emerald-700' :
+                                n.type.includes('REJECTED') || n.type.includes('BANNED') ? 'bg-rose-100 text-rose-700' :
+                                n.type.includes('SUSPENDED') ? 'bg-amber-100 text-amber-700' :
+                                n.type.includes('NEW_ACCOUNT') || n.type.includes('NEW_') ? 'bg-blue-100 text-blue-700' :
+                                'bg-slate-100 text-slate-600'
+                              }`}>
+                                {n.type.replace(/_/g, ' ')}
+                              </span>
+                              {n.transactionId && (
+                                <span className="text-[9px] font-mono text-slate-400">{n.transactionId}</span>
+                              )}
+                            </div>
                             <span className="text-[10px] text-slate-400">
                               {new Date(n.createdAt).toLocaleTimeString([], {
                                 hour: '2-digit',
@@ -339,7 +358,11 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                               })}
                             </span>
                           </div>
-                          <p className="text-slate-600">{n.message}</p>
+                          <p className="font-bold text-slate-900">{n.title}</p>
+                          <p className="text-slate-600 mt-0.5 truncate">{n.message}</p>
+                          {n.amount && n.amount > 0 && (
+                            <p className="text-[10px] font-mono text-blue-600 mt-1">{n.currency} {n.amount.toLocaleString()}</p>
+                          )}
                         </div>
                       ))
                     )}

@@ -23,7 +23,8 @@ export type AdminRole =
   | 'AUDITOR';
 
 export type KycStatus = 'PENDING' | 'VERIFIED' | 'REJECTED' | 'ADDITIONAL_INFO_REQUIRED';
-export type AccountStatus = 'ACTIVE' | 'FROZEN' | 'SUSPENDED' | 'BANNED';
+export type AccountStatus = 'ACTIVE' | 'FROZEN' | 'SUSPENDED' | 'BANNED' | 'PENDING' | 'REJECTED';
+export type VerificationStatus = 'PENDING' | 'VERIFIED' | 'REJECTED' | 'SUSPENDED';
 export type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH';
 
 export type DepositStatus = 
@@ -97,9 +98,11 @@ export interface User {
   nativeCurrency: Currency;
   kycStatus: KycStatus;
   accountStatus: AccountStatus;
+  verificationStatus: VerificationStatus;
   riskLevel: RiskLevel;
   balances: Partial<Record<Currency, number>>;
   createdAt: string;
+  updatedAt?: string;
   kycDocuments: KycDocument[];
   address?: string;
   occupation?: string;
@@ -418,13 +421,31 @@ export interface SystemNotification {
     | 'PAYOUT_FAILED' 
     | 'KYC_REVIEW' 
     | 'FRAUD_RISK' 
-    | 'PROVIDER_ERROR';
+    | 'PROVIDER_ERROR'
+    | 'NEW_ACCOUNT'
+    | 'ACCOUNT_VERIFIED'
+    | 'ACCOUNT_REJECTED'
+    | 'ACCOUNT_SUSPENDED'
+    | 'ACCOUNT_BANNED'
+    | 'ACCOUNT_UNBANNED'
+    | 'ACCOUNT_FROZEN'
+    | 'ACCOUNT_ACTIVATED'
+    | 'DEPOSIT_APPROVED'
+    | 'DEPOSIT_REJECTED'
+    | 'TRANSFER_APPROVED'
+    | 'TRANSFER_REJECTED'
+    | 'NEW_USDT_SELL'
+    | 'KYC_VERIFIED'
+    | 'KYC_REJECTED';
   title: string;
   message: string;
   amount?: number;
   currency?: Currency;
+  userId?: string;
+  userName?: string;
+  transactionId?: string;
   referenceId?: string;
-  referenceType?: 'DEPOSIT' | 'TRANSFER' | 'KYC' | 'PROVIDER' | 'USER';
+  referenceType?: 'DEPOSIT' | 'TRANSFER' | 'KYC' | 'PROVIDER' | 'USER' | 'USDT_SELL';
   createdAt: string;
   read: boolean;
 }

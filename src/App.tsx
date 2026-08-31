@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { AdminLayout } from './components/admin/AdminLayout';
@@ -21,6 +21,21 @@ const AppContent: React.FC = () => {
   const [currentPath, setCurrentPath] = useState<string>('/admin/dashboard');
   const [selectedDepositId, setSelectedDepositId] = useState<string | null>(null);
   const [selectedTransferId, setSelectedTransferId] = useState<string | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleNavigate = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.path) {
+        if (detail.depositId) setSelectedDepositId(detail.depositId);
+        if (detail.transferId) setSelectedTransferId(detail.transferId);
+        if (detail.userId) setSelectedUserId(detail.userId);
+        setCurrentPath(detail.path);
+      }
+    };
+    window.addEventListener('admin-navigate', handleNavigate);
+    return () => window.removeEventListener('admin-navigate', handleNavigate);
+  }, []);
 
   if (isLoading) {
     return (
@@ -71,7 +86,7 @@ const AppContent: React.FC = () => {
       case '/admin/payment-methods':
         return <PaymentMethodsView />;
       case '/admin/users':
-        return <UserManagementView />;
+        return <UserManagementView selectedUserId={selectedUserId} onClearSelectedUser={() => setSelectedUserId(null)} />;
       case '/admin/support':
         return <AdminSupport />;
       case '/admin/settings':
@@ -107,6 +122,7 @@ const AppContent: React.FC = () => {
       onNavigate={(path) => {
         setSelectedDepositId(null);
         setSelectedTransferId(null);
+        setSelectedUserId(null);
         setCurrentPath(path);
       }}
     >
