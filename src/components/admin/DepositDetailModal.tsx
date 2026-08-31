@@ -166,13 +166,13 @@ export const DepositDetailModal: React.FC<DepositDetailModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-slate-900 text-base">Deposit: {deposit.id}</span>
+                <span className="font-black text-slate-900 text-base tracking-tight">Deposit: <span className="font-mono font-black bg-slate-900 text-white px-2 py-0.5 rounded text-[13px] select-all">{deposit.id}</span></span>
                 <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${getStatusBadge(deposit.status)}`}>
                   {deposit.status}
                 </span>
               </div>
-              <div className="text-xs text-slate-500 mt-0.5">
-                Reference: <span className="font-mono text-slate-800 font-semibold">{deposit.reference}</span> &bull; Provider Ref: <span className="font-mono text-slate-600">{deposit.providerReference}</span>
+              <div className="text-xs text-slate-500 mt-0.5 flex flex-wrap items-center gap-1.5">
+                Reference: <span className="font-mono text-slate-900 font-black bg-amber-100 border border-amber-300 px-1.5 py-0.5 rounded text-[11px] select-all">{deposit.reference}</span> &bull; Provider Ref: <span className="font-mono text-slate-900 font-extrabold bg-white border border-slate-300 px-1.5 py-0.5 rounded text-[11px] select-all">{deposit.providerReference || '—'}</span>
               </div>
             </div>
           </div>
@@ -239,17 +239,20 @@ export const DepositDetailModal: React.FC<DepositDetailModalProps> = ({
               <div className="text-[11px] text-slate-500 mt-1">
                 Payment: <span className="font-bold text-slate-800">AWAITING_VERIFICATION</span>
               </div>
-              <div className="text-[11px] text-slate-500 mt-1.5">
-                Payment Reference: <span className="font-mono font-bold text-slate-900">{deposit.reference}</span>
+              <div className="text-[11px] text-slate-700 font-bold mt-1.5 flex items-center gap-1.5 flex-wrap">
+                Transaction ID: <span className="font-mono font-black text-white bg-slate-900 px-2 py-1 rounded text-xs tracking-wide select-all border border-slate-700">{deposit.id}</span>
+              </div>
+              <div className="text-[11px] text-slate-700 font-bold mt-1.5 flex items-center gap-1.5 flex-wrap">
+                Payment Reference: <span className="font-mono font-black text-slate-900 bg-amber-100 border-2 border-amber-400 px-2 py-1 rounded text-xs tracking-wide select-all">{deposit.reference}</span>
               </div>
               {deposit.providerReference && (
-                <div className="text-[11px] text-slate-500 mt-0.5">
-                  Provider Ref: <span className="font-mono font-semibold text-slate-700">{deposit.providerReference}</span>
+                <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-1.5 flex-wrap">
+                  Provider Ref: <span className="font-mono font-extrabold text-slate-900 bg-white border border-slate-300 px-2 py-0.5 rounded text-[11px] select-all">{deposit.providerReference}</span>
                 </div>
               )}
               {deposit.customerTrxId && (
-                <div className="text-[11px] text-slate-500 mt-0.5">
-                  Customer Trx ID: <span className="font-mono font-semibold text-slate-700">{deposit.customerTrxId}</span>
+                <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-1.5 flex-wrap">
+                  Customer Trx ID: <span className="font-mono font-extrabold text-slate-900 bg-white border border-slate-300 px-2 py-0.5 rounded text-[11px] select-all">{deposit.customerTrxId}</span>
                 </div>
               )}
             </div>

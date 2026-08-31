@@ -157,13 +157,13 @@ export const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-slate-900 text-base">Transfer: {transfer.id}</span>
+                <span className="font-black text-slate-900 text-base tracking-tight">Transfer: <span className="font-mono font-black bg-slate-900 text-white px-2 py-0.5 rounded text-[13px] select-all">{transfer.id}</span></span>
                 <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${getStatusBadge(transfer.status)}`}>
                   {transfer.status}
                 </span>
               </div>
-              <div className="text-xs text-slate-500 mt-0.5">
-                Payout Reference: <span className="font-mono text-slate-800 font-semibold">{transfer.payoutReference}</span>
+              <div className="text-xs text-slate-500 mt-0.5 flex flex-wrap items-center gap-1.5">
+                Payout Reference: <span className="font-mono text-slate-900 font-black bg-amber-100 border border-amber-300 px-1.5 py-0.5 rounded text-[11px] select-all">{transfer.payoutReference || '—'}</span>
               </div>
             </div>
           </div>
@@ -232,17 +232,20 @@ export const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
             <div className="text-[11px] text-slate-500 mt-1">
               Payment: <span className="font-bold text-slate-800">AWAITING_VERIFICATION</span>
             </div>
-            <div className="text-[11px] text-slate-500 mt-1.5">
-              Payment Reference: <span className="font-mono font-bold text-slate-900">{transfer.payoutReference || transfer.providerReference || transfer.id}</span>
+            <div className="text-[11px] text-slate-700 font-bold mt-1.5 flex items-center gap-1.5 flex-wrap">
+              Transaction ID: <span className="font-mono font-black text-white bg-slate-900 px-2 py-1 rounded text-xs tracking-wide select-all border border-slate-700">{transfer.id}</span>
+            </div>
+            <div className="text-[11px] text-slate-700 font-bold mt-1.5 flex items-center gap-1.5 flex-wrap">
+              Payment Reference: <span className="font-mono font-black text-slate-900 bg-amber-100 border-2 border-amber-400 px-2 py-1 rounded text-xs tracking-wide select-all">{transfer.payoutReference || transfer.providerReference || transfer.id}</span>
             </div>
             {transfer.providerReference && transfer.providerReference !== transfer.payoutReference && (
-              <div className="text-[11px] text-slate-500 mt-0.5">
-                Provider Ref: <span className="font-mono font-semibold text-slate-700">{transfer.providerReference}</span>
+              <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-1.5 flex-wrap">
+                Provider Ref: <span className="font-mono font-extrabold text-slate-900 bg-white border border-slate-300 px-2 py-0.5 rounded text-[11px] select-all">{transfer.providerReference}</span>
               </div>
             )}
             {transfer.ledgerTransactionId && (
-              <div className="text-[11px] text-slate-500 mt-0.5">
-                Ledger Txn ID: <span className="font-mono font-semibold text-slate-700">{transfer.ledgerTransactionId}</span>
+              <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-1.5 flex-wrap">
+                Ledger Txn ID: <span className="font-mono font-extrabold text-slate-900 bg-white border border-slate-300 px-2 py-0.5 rounded text-[11px] select-all">{transfer.ledgerTransactionId}</span>
               </div>
             )}
           </div>
