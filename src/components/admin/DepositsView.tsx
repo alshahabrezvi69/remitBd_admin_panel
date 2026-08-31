@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Currency, Deposit, DepositStatus } from '../../types';
-import { asNumber, normalizeDeposit, readApiError } from '../../utils/api';
+import { asNumber, normalizeDeposit, readApiError, apiFetch } from '../../utils/api';
 import {
   Search,
   Filter,
@@ -49,7 +49,7 @@ export const DepositsView: React.FC<DepositsViewProps> = ({
       if (currencyFilter !== 'ALL') params.append('currency', currencyFilter);
       if (searchQuery) params.append('search', searchQuery);
 
-      const res = await fetch(`/api/admin/deposits?${params.toString()}`, {
+      const res = await apiFetch(`/api/admin/deposits?${params.toString()}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const json = await res.json().catch(() => ({}));

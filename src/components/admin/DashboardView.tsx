@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Currency } from '../../types';
-import { normalizeTransfer, readApiError, asNumber } from '../../utils/api';
+import { normalizeTransfer, readApiError, asNumber, apiFetch } from '../../utils/api';
 import {
   Users,
   UserCheck,
@@ -65,8 +65,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         setMetrics(emptyDashboardMetrics);
         return;
       }
-      const res = await fetch('/api/admin/dashboard/metrics', {
-        headers: { Authorization: `Bearer ${token}` },
+      const res = await apiFetch('/api/admin/dashboard/metrics', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -115,6 +115,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     { code: 'BHD', country: 'Bahrain', flag: '🇧🇭' },
     { code: 'MVR', country: 'Maldives', flag: '🇲🇻' },
     { code: 'EUR', country: 'Eurozone', flag: '🇪🇺' },
+    { code: 'USD', country: 'United States', flag: '🇺🇸' },
+    { code: 'GBP', country: 'United Kingdom', flag: '🇬🇧' },
+    { code: 'BDT', country: 'Bangladesh', flag: '🇧🇩' },
   ];
 
   if (loading && !metrics) {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { User, Currency, Deposit, Transfer } from '../../types';
-import { asNumber, normalizeDeposit, normalizeTransfer, normalizeUser, readApiError } from '../../utils/api';
+import { asNumber, normalizeDeposit, normalizeTransfer, normalizeUser, readApiError, apiFetch } from '../../utils/api';
 import {
   Users,
   Search,
@@ -39,7 +39,7 @@ export const UserManagementView: React.FC = () => {
     try {
       setLoading(true);
       setLoadError(null);
-      const res = await fetch(`/api/admin/users?search=${encodeURIComponent(searchQuery)}`, {
+      const res = await apiFetch(`/api/admin/users?search=${encodeURIComponent(searchQuery)}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const json = await res.json().catch(() => ({}));
@@ -65,7 +65,7 @@ export const UserManagementView: React.FC = () => {
     setHistoryError(null);
     setHistoryLoading(true);
     try {
-      const res = await fetch(`/api/admin/users/${u.id}/history`, {
+      const res = await apiFetch(`/api/admin/users/${u.id}/history`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const json = await res.json().catch(() => ({}));
@@ -88,7 +88,7 @@ export const UserManagementView: React.FC = () => {
     setFeedback(null);
 
     try {
-      const res = await fetch(`/api/admin/users/${selectedUser.id}/action`, {
+      const res = await apiFetch(`/api/admin/users/${selectedUser.id}/action`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ export const UserManagementView: React.FC = () => {
         setActionReason('');
         fetchUsers();
         // refresh selected user
-        const refreshedRes = await fetch(`/api/admin/users/${selectedUser.id}`, {
+        const refreshedRes = await apiFetch(`/api/admin/users/${selectedUser.id}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         if (refreshedRes.ok) {

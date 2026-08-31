@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Currency, FundingAccount } from '../../types';
+import { apiFetch } from '../../utils/api';
 import {
   Landmark,
   Plus,
@@ -60,7 +61,7 @@ export const FundingAccountsView: React.FC = () => {
   const fetchAccounts = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/admin/funding-accounts', {
+      const res = await apiFetch('/api/admin/funding-accounts', {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (res.ok) {
@@ -113,7 +114,7 @@ export const FundingAccountsView: React.FC = () => {
         : '/api/admin/funding-accounts';
       const method = editingAccount ? 'PUT' : 'POST';
 
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -137,7 +138,7 @@ export const FundingAccountsView: React.FC = () => {
 
   const handleToggleStatus = async (id: string, newStatus: 'ACTIVE' | 'INACTIVE' | 'ARCHIVED') => {
     try {
-      const res = await fetch(`/api/admin/funding-accounts/${id}/status`, {
+      const res = await apiFetch(`/api/admin/funding-accounts/${id}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -153,7 +154,7 @@ export const FundingAccountsView: React.FC = () => {
     }
   };
 
-  const currencies: Currency[] = ['SAR', 'AED', 'QAR', 'KWD', 'OMR', 'MYR', 'SGD', 'BHD', 'MVR', 'EUR'];
+  const currencies: Currency[] = ['SAR', 'AED', 'QAR', 'KWD', 'OMR', 'MYR', 'SGD', 'BHD', 'MVR', 'EUR', 'USD', 'GBP', 'BDT'];
 
   return (
     <div className="space-y-6">

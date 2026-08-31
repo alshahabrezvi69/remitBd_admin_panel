@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Currency, FXRate } from '../../types';
+import { apiFetch } from '../../utils/api';
 import {
   TrendingUp,
   RefreshCw,
@@ -26,7 +27,7 @@ export const FxManagementView: React.FC = () => {
   const fetchRates = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/admin/fx', {
+      const res = await apiFetch('/api/admin/fx', {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (res.ok) {
@@ -48,7 +49,7 @@ export const FxManagementView: React.FC = () => {
     setSyncing(true);
     setStatusMsg(null);
     try {
-      const res = await fetch('/api/admin/fx/sync', {
+      const res = await apiFetch('/api/admin/fx/sync', {
         method: 'POST',
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
@@ -78,7 +79,7 @@ export const FxManagementView: React.FC = () => {
     setStatusMsg(null);
 
     try {
-      const res = await fetch(`/api/admin/fx/${editingRate.pair}`, {
+      const res = await apiFetch(`/api/admin/fx/${editingRate.pair}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

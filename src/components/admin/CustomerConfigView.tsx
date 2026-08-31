@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Check, DollarSign, Pencil, Plus, RefreshCw, Save, Settings2, Trash2, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { apiFetch } from '../../utils/api';
 
 type CurrencyConfig = {
   currency_code: string;
@@ -70,7 +71,7 @@ export const CustomerConfigView: React.FC = () => {
   const load = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/customer-config', { headers: authHeaders });
+      const response = await apiFetch('/api/admin/customer-config', { headers: authHeaders });
       if (!response.ok) throw new Error('Configuration could not be loaded.');
       const data = await response.json();
       setCurrencies(Array.isArray(data.currencies) ? data.currencies : []);
@@ -88,7 +89,7 @@ export const CustomerConfigView: React.FC = () => {
   const saveAll = async (nextCurrencies = currencies, nextCorridors = corridors) => {
     setSaving(true);
     try {
-      const response = await fetch('/api/admin/customer-config', {
+      const response = await apiFetch('/api/admin/customer-config', {
         method: 'PUT',
         headers: { ...authHeaders, 'Content-Type': 'application/json' },
         body: JSON.stringify({ currencies: nextCurrencies, corridors: nextCorridors }),

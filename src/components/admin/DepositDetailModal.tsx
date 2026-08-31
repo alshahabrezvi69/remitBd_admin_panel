@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Deposit, FundingAccount, User } from '../../types';
-import { normalizeDeposit, normalizeFundingAccount, normalizeUser, readApiError, asNumber } from '../../utils/api';
+import { normalizeDeposit, normalizeFundingAccount, normalizeUser, readApiError, asNumber, apiFetch } from '../../utils/api';
 import {
   X,
   CheckCircle2,
@@ -46,7 +46,7 @@ export const DepositDetailModal: React.FC<DepositDetailModalProps> = ({
     try {
       setLoading(true);
       setLoadError(null);
-      const res = await fetch(`/api/admin/deposits/${depositId}`, {
+      const res = await apiFetch(`/api/admin/deposits/${depositId}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const json = await res.json().catch(() => ({}));
@@ -54,9 +54,9 @@ export const DepositDetailModal: React.FC<DepositDetailModalProps> = ({
       const deposit = normalizeDeposit(json.deposit ?? json);
       const [userResponse, accountsResponse] = await Promise.all([
         deposit.userId
-          ? fetch(`/api/admin/users/${deposit.userId}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} })
+          ? apiFetch(`/api/admin/users/${deposit.userId}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} })
           : Promise.resolve(null),
-        fetch('/api/admin/funding-accounts', { headers: token ? { Authorization: `Bearer ${token}` } : {} }),
+        apiFetch('/api/admin/funding-accounts', { headers: token ? { Authorization: `Bearer ${token}` } : {} }),
       ]);
       let user: User | undefined;
       if (userResponse?.ok) user = normalizeUser(await userResponse.json());
@@ -86,7 +86,7 @@ export const DepositDetailModal: React.FC<DepositDetailModalProps> = ({
     setActionLoading(true);
 
     try {
-      const res = await fetch(`/api/admin/deposits/${depositId}/action`, {
+      const res = await apiFetch(`/api/admin/deposits/${depositId}/action`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

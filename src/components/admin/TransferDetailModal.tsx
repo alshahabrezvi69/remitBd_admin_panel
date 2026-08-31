@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Transfer, User } from '../../types';
-import { normalizeTransfer, normalizeUser, readApiError, asNumber } from '../../utils/api';
+import { normalizeTransfer, normalizeUser, readApiError, asNumber, apiFetch } from '../../utils/api';
 import {
   X,
   CheckCircle2,
@@ -45,7 +45,7 @@ export const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
     try {
       setLoading(true);
       setLoadError(null);
-      const res = await fetch(`/api/admin/transfers/${transferId}`, {
+      const res = await apiFetch(`/api/admin/transfers/${transferId}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const json = await res.json().catch(() => ({}));
@@ -53,7 +53,7 @@ export const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
       const transfer = normalizeTransfer(json.transfer ?? json);
       let sender: User | undefined;
       if (transfer.senderId) {
-        const senderResponse = await fetch(`/api/admin/users/${transfer.senderId}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+        const senderResponse = await apiFetch(`/api/admin/users/${transfer.senderId}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
         if (senderResponse.ok) sender = normalizeUser(await senderResponse.json());
       }
       setData({ transfer, sender });
@@ -76,7 +76,7 @@ export const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
     setActionLoading(true);
 
     try {
-      const res = await fetch(`/api/admin/transfers/${transferId}/action`, {
+      const res = await apiFetch(`/api/admin/transfers/${transferId}/action`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
