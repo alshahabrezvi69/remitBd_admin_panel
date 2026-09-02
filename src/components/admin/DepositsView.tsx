@@ -233,7 +233,10 @@ export const DepositsView: React.FC<DepositsViewProps> = ({
                       <div className="text-[11px] text-slate-500">{dep.paymentMethodName}</div>
                     </td>
                     <td className="py-3.5 px-4 font-mono font-bold text-emerald-600 text-sm">
-                      +{asNumber(dep.amount).toLocaleString()} {dep.currency}
+                      <div>+{asNumber(dep.amount).toLocaleString()} {dep.currency}</div>
+                      {dep.couponCode && (
+                        <div className="text-[10px] font-mono text-purple-600">Coupon: {dep.couponCode} (+{dep.bonusPercent}% → +৳{asNumber(dep.bonusBdt).toLocaleString()} Total ৳{asNumber(dep.totalBdtAmount).toLocaleString()})</div>
+                      )}
                     </td>
                     <td className="py-3.5 px-4">
                       <div className="font-mono text-slate-900 font-semibold">{dep.reference}</div>

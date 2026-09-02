@@ -25,6 +25,7 @@ import {
   Gift,
   Landmark,
   Coins,
+  Ticket,
 } from 'lucide-react';
 import { AdminRole } from '../../types';
 
@@ -89,6 +90,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     {
       group: 'System & Governance',
       items: [
+        { path: '/admin/coupons', label: 'Coupon Codes', icon: Ticket, badge: null },
         { path: '/admin/content', label: 'Customer Content', icon: Gift, badge: null },
         { path: '/admin/customer-config', label: 'Customer Configuration', icon: SlidersHorizontal, badge: null },
         { path: '/admin/settings', label: 'System Settings', icon: Settings, badge: null },

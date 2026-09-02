@@ -165,6 +165,11 @@ export interface Deposit {
   country: string;
   currency: Currency;
   amount: number;
+  baseBdtAmount?: number;
+  bonusBdt?: number;
+  totalBdtAmount?: number;
+  couponCode?: string;
+  bonusPercent?: number;
   paymentMethodId: string;
   paymentMethodName: string;
   paymentMethodSnapshot?: PaymentMethodSnapshot;
