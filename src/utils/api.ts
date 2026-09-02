@@ -158,6 +158,8 @@ export const normalizeTransfer = (item: AnyRecord = {}): Transfer => {
     country: asString(item.country, 'Not specified'),
     currency: asString(item.currency, 'SAR') as Currency,
     amount: asNumber(item.amount),
+    payableForeignAmount: asNumber(value(item, 'payableForeignAmount', 'payable_foreign_amount'), asNumber(item.amount)),
+    requestedBdtAmount: asNumber(value(item, 'requestedBdtAmount', 'requested_bdt_amount'), asNumber(value(item, 'bdtAmount', 'bdt_amount'))),
     fxRate: asNumber(value(item, 'fxRate', 'fx_rate')),
     fee: asNumber(item.fee),
     recipientName: asString(value(item, 'recipientName', 'recipient_name'), 'Unknown recipient'),
@@ -165,10 +167,14 @@ export const normalizeTransfer = (item: AnyRecord = {}): Transfer => {
     recipientRelationship: asString(value(item, 'recipientRelationship', 'recipient_relationship'), 'Family'),
     payoutMethod: asString(value(item, 'payoutMethod', 'payout_method'), 'BANK_TRANSFER') as Transfer['payoutMethod'],
     payoutAccountNumber: asString(value(item, 'payoutAccountNumber', 'payout_account_number'), 'Not provided'),
+    accountType: asString(value(item, 'accountType', 'account_type')) as Transfer['accountType'],
     bankName: asString(item.bankName ?? item.bank_name),
     branchName: asString(item.branchName ?? item.branch_name),
     routingNumber: asString(item.routingNumber ?? item.routing_number),
     bdtAmount: asNumber(value(item, 'bdtAmount', 'bdt_amount')),
+    targetCurrency: asString(value(item, 'targetCurrency', 'target_currency'), 'BDT') as Currency,
+    couponCode: asString(value(item, 'couponCode', 'coupon_code')),
+    bonusPercent: asNumber(value(item, 'bonusPercent', 'bonus_percent')),
     status: asString(item.status, 'CREATED') as Transfer['status'],
     providerReference: asString(value(item, 'providerReference', 'provider_reference')),
     payoutReference: asString(value(item, 'payoutReference', 'payout_reference')),
@@ -191,6 +197,20 @@ export const normalizeTransfer = (item: AnyRecord = {}): Transfer => {
     })) : [],
   };
 };
+
+export const normalizeCoupon = (item: AnyRecord = {}): import('../types').Coupon => ({
+  id: asString(item.id, 'unknown-coupon'),
+  code: asString(item.code, ''),
+  bonusPercent: asNumber(value(item, 'bonusPercent', 'bonus_percent')),
+  isActive: asBoolean(value(item, 'isActive', 'is_active'), true),
+  description: asString(item.description),
+  maxUses: asNumber(value(item, 'maxUses', 'max_uses')),
+  usedCount: asNumber(value(item, 'usedCount', 'used_count')),
+  expiresAt: asString(value(item, 'expiresAt', 'expires_at')),
+  createdAt: asString(value(item, 'createdAt', 'created_at')),
+  updatedAt: asString(value(item, 'updatedAt', 'updated_at')),
+  createdBy: asString(value(item, 'createdBy', 'created_by')),
+});
 
 export const normalizePaymentMethodSnapshot = (item: AnyRecord | null | undefined): PaymentMethodSnapshot | undefined => {
   if (!item || typeof item !== 'object') return undefined;

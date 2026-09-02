@@ -192,6 +192,8 @@ export interface Transfer {
   country: string;
   currency: Currency;
   amount: number;
+  payableForeignAmount?: number;
+  requestedBdtAmount?: number;
   fxRate: number;
   fee: number;
   recipientName: string;
@@ -199,10 +201,14 @@ export interface Transfer {
   recipientRelationship: string;
   payoutMethod: PayoutMethod;
   payoutAccountNumber: string;
+  accountType?: 'personal' | 'agent' | string;
   bankName?: string;
   branchName?: string;
   routingNumber?: string;
   bdtAmount: number;
+  targetCurrency?: Currency;
+  couponCode?: string;
+  bonusPercent?: number;
   status: TransferStatus;
   providerReference: string;
   payoutReference: string;
@@ -223,6 +229,20 @@ export interface Transfer {
     action: string;
     reason: string;
   }>;
+}
+
+export interface Coupon {
+  id: string;
+  code: string;
+  bonusPercent: number;
+  isActive: boolean;
+  description?: string;
+  maxUses: number;
+  usedCount: number;
+  expiresAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy?: string;
 }
 
 export interface FundingAccount {

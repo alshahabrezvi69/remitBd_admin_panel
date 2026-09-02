@@ -192,32 +192,36 @@ export const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
             </div>
           )}
 
-          {/* Amount & FX Summary Cards */}
+          {/* Amount & FX Summary Cards - BDT-target with reverse logic */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl">
-              <div className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">Source Remittance</div>
+              <div className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">Paid (Foreign)</div>
               <div className="text-2xl font-bold font-mono text-slate-900 mt-1">
-                {asNumber(transfer.amount).toLocaleString()} {transfer.currency}
+                {asNumber(transfer.payableForeignAmount || transfer.amount).toLocaleString()} {transfer.currency}
               </div>
               <div className="text-xs text-slate-500 mt-1">From: {transfer.country}</div>
+              {transfer.couponCode && (
+                <div className="text-[11px] font-bold text-purple-600 mt-1">Coupon: {transfer.couponCode} (-{transfer.bonusPercent}%)</div>
+              )}
             </div>
 
             <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl">
-              <div className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">Treasury Rate &amp; Spread</div>
+              <div className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">Treasury Rate (BDT-target)</div>
               <div className="text-sm font-mono font-bold text-blue-600 mt-1">
                 1 {transfer.currency} = {transfer.fxRate} BDT
               </div>
               <div className="text-[11px] text-slate-500 mt-1">
                 Platform Transfer Fee: <span className="text-emerald-600 font-mono font-bold">0.00 {transfer.currency} (FREE)</span>
               </div>
+              <div className="text-[10px] text-slate-400 mt-1">Reverse: BDT ÷ rate = payable foreign</div>
             </div>
 
             <div className="bg-blue-50/50 border border-blue-200 p-4 rounded-xl">
-              <div className="text-[11px] text-blue-800 font-bold uppercase tracking-wider">Recipient Payout (BDT)</div>
+              <div className="text-[11px] text-blue-800 font-bold uppercase tracking-wider">BDT Credited (Target)</div>
               <div className="text-2xl font-bold font-mono text-emerald-600 mt-1">
                 ৳ {asNumber(transfer.bdtAmount).toLocaleString()} BDT
               </div>
-              <div className="text-xs text-blue-700 mt-1">Disbursement via {transfer.payoutMethod}</div>
+              <div className="text-xs text-blue-700 mt-1">Disbursement via {transfer.payoutMethod}{transfer.accountType ? ` (${transfer.accountType})` : ''} • BDT locked</div>
             </div>
           </div>
 
@@ -312,34 +316,53 @@ export const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
               </div>
             </div>
 
-            {/* Recipient */}
+            {/* Recipient - hide name for mobile banking, show account_type */}
             <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl">
               <div className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">
                 <Building className="w-4 h-4 text-blue-600" />
                 <span>Bangladesh Recipient</span>
+                {transfer.accountType && (
+                  <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full border bg-blue-50 text-blue-700 border-blue-200">{transfer.accountType.toUpperCase()}</span>
+                )}
               </div>
               <div className="space-y-1.5 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Beneficiary Name:</span>
-                  <span className="font-bold text-slate-900">{transfer.recipientName}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Phone:</span>
-                  <span className="font-mono text-slate-700">{transfer.recipientPhone}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Payout Method:</span>
-                  <span className="font-mono text-blue-700 font-bold">{transfer.payoutMethod}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Account / Wallet #:</span>
-                  <span className="font-mono text-slate-900 font-bold">{transfer.payoutAccountNumber}</span>
-                </div>
-                {transfer.bankName && (
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Bank &amp; Branch:</span>
-                    <span className="text-slate-700">{transfer.bankName} ({transfer.branchName || 'Main'})</span>
-                  </div>
+                {['BKASH','NAGAD','ROCKET'].includes((transfer.payoutMethod||'').toUpperCase()) ? (
+                  <>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Payout Method:</span>
+                      <span className="font-mono text-blue-700 font-bold">{transfer.payoutMethod} {transfer.accountType ? `(${transfer.accountType})` : ''}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Mobile Wallet #:</span>
+                      <span className="font-mono text-slate-900 font-bold">{transfer.payoutAccountNumber}</span>
+                    </div>
+                    <div className="text-[11px] text-slate-400 italic">Recipient Name hidden for mobile banking - manual payout via {transfer.payoutMethod}{transfer.accountType ? ` ${transfer.accountType}` : ''} number</div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Beneficiary Name:</span>
+                      <span className="font-bold text-slate-900">{transfer.recipientName}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Phone:</span>
+                      <span className="font-mono text-slate-700">{transfer.recipientPhone}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Payout Method:</span>
+                      <span className="font-mono text-blue-700 font-bold">{transfer.payoutMethod}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Account / Wallet #:</span>
+                      <span className="font-mono text-slate-900 font-bold">{transfer.payoutAccountNumber}</span>
+                    </div>
+                    {transfer.bankName && (
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Bank &amp; Branch:</span>
+                        <span className="text-slate-700">{transfer.bankName} ({transfer.branchName || 'Main'})</span>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>

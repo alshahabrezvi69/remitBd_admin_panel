@@ -245,8 +245,16 @@ export const TransfersView: React.FC<TransfersViewProps> = ({
                       <div className="font-bold text-slate-900">{tx.senderName}</div>
                       <div className="text-[11px] text-slate-500">{tx.country}</div>
                     </td>
-                    <td className="py-3.5 px-4 font-mono font-bold text-slate-900 text-sm">
-                      {asNumber(tx.amount).toLocaleString()} {tx.currency}
+                    <td className="py-3.5 px-4">
+                      <div className="font-mono font-bold text-slate-900 text-sm">
+                        {asNumber(tx.payableForeignAmount || tx.amount).toLocaleString()} {tx.currency}
+                      </div>
+                      <div className="font-mono text-[11px] text-emerald-600 font-bold">
+                        → ৳ {asNumber(tx.bdtAmount).toLocaleString()} BDT
+                      </div>
+                      {tx.couponCode && (
+                        <div className="text-[10px] font-mono text-purple-600">Coupon: {tx.couponCode} (-{tx.bonusPercent}%)</div>
+                      )}
                     </td>
                     <td className="py-3.5 px-4 font-mono text-blue-600 font-semibold">
                       1 = {asNumber(tx.fxRate)}
@@ -256,12 +264,22 @@ export const TransfersView: React.FC<TransfersViewProps> = ({
                         ৳ {asNumber(tx.bdtAmount).toLocaleString()} BDT
                       </div>
                       <div className="text-[10px] font-mono text-slate-500">
-                        {tx.payoutMethod}{tx.bankName ? ` (${tx.bankName})` : ''}
+                        {tx.payoutMethod}{tx.accountType ? ` (${tx.accountType})` : ''}{tx.bankName ? ` • ${tx.bankName}` : ''} • {tx.payoutAccountNumber}
                       </div>
                     </td>
                     <td className="py-3.5 px-4">
-                      <div className="font-semibold text-slate-800">{tx.recipientName}</div>
-                      <div className="font-mono text-[11px] text-slate-500">{tx.recipientPhone}</div>
+                      {['BKASH','NAGAD','ROCKET'].includes((tx.payoutMethod||'').toUpperCase()) ? (
+                        <>
+                          <div className="font-mono text-[11px] text-slate-700 font-bold">{tx.payoutAccountNumber}</div>
+                          <div className="text-[10px] font-mono text-slate-500">{tx.accountType ? `${tx.accountType} • ` : ''}{tx.payoutMethod}</div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="font-semibold text-slate-800">{tx.recipientName}</div>
+                          <div className="font-mono text-[11px] text-slate-500">{tx.payoutAccountNumber}</div>
+                          {tx.bankName && <div className="text-[10px] text-slate-500">{tx.bankName}</div>}
+                        </>
+                      )}
                     </td>
                     <td className="py-3.5 px-4">
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${getStatusBadge(tx.status)}`}>

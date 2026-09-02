@@ -118,7 +118,7 @@ export const FxManagementView: React.FC = () => {
             </span>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Manage interbank provider rates, customer conversion margins, spread yields, and locked quote validity windows.
+            Manage interbank provider rates, customer conversion margins, spread yields, and locked quote validity windows. <span className="font-semibold text-blue-600">Reverse BDT-target: customer enters BDT, payable foreign = BDT ÷ rate × (1 - bonus%).</span>
           </p>
         </div>
 
@@ -184,10 +184,10 @@ export const FxManagementView: React.FC = () => {
                 </div>
               </div>
 
-              {/* Customer Rate Highlight */}
+              {/* Customer Rate Highlight - reverse */}
               <div className="mt-4 p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
                 <div className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">
-                  Customer Conversion Rate
+                  Customer Conversion Rate (BDT-target)
                 </div>
                 <div className="text-xl font-bold font-mono text-slate-900 mt-0.5">
                   1 {rate.fromCurrency} = <span className="text-emerald-600">{rate.customerRate} BDT</span>
@@ -196,6 +196,7 @@ export const FxManagementView: React.FC = () => {
                   <span>Provider Interbank Base:</span>
                   <span className="font-mono text-slate-700 font-medium">1 = {rate.providerRate} BDT</span>
                 </div>
+                <div className="text-[10px] text-blue-600 mt-1 font-medium">Reverse: 10000 BDT → {(10000/(rate.customerRate||1)).toFixed(2)} {rate.fromCurrency} payable</div>
               </div>
 
               <div className="mt-3 space-y-1 text-[11px] text-slate-500">

@@ -92,6 +92,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     {
       group: 'System & Governance',
       items: [
+        { path: '/admin/coupons', label: 'Coupons (Bonus %)', icon: Gift, badge: null },
         { path: '/admin/content', label: 'Customer Content', icon: Gift, badge: null },
         { path: '/admin/customer-config', label: 'Customer Configuration', icon: SlidersHorizontal, badge: null },
         { path: '/admin/settings', label: 'System Settings', icon: Settings, badge: null },
