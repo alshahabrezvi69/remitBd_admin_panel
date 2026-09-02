@@ -21,7 +21,7 @@ export const ContentManagementView: React.FC = () => {
   const [videoForm, setVideoForm] = useState<VideoForm>(emptyVideoForm);
   const [editingVideoId, setEditingVideoId] = useState<string | null>(null);
   const [savingVideo, setSavingVideo] = useState(false);
-  const [couponForm, setCouponForm] = useState({ code: '', bonus_percent: '10', description: 'Add Money 10% Extra Bonus', max_uses: '0', expires_at: '', is_active: true });
+  const [couponForm, setCouponForm] = useState({ code: '', bonus_percent: '10', description: 'Extra BDT Bonus for Send Money & Add Money', max_uses: '0', expires_at: '', is_active: true });
   const [editingCouponId, setEditingCouponId] = useState<string | null>(null);
   const [savingCoupon, setSavingCoupon] = useState(false);
 
@@ -76,7 +76,7 @@ export const ContentManagementView: React.FC = () => {
         setMessage(err.detail || 'Coupon could not be saved.');
         return;
       }
-      setCouponForm({ code: '', bonus_percent: '10', description: 'Add Money 10% Extra Bonus', max_uses: '0', expires_at: '', is_active: true });
+      setCouponForm({ code: '', bonus_percent: '10', description: 'Extra BDT Bonus for Send Money & Add Money', max_uses: '0', expires_at: '', is_active: true });
       setEditingCouponId(null);
       setMessage(editingCouponId ? 'Coupon updated. Users can apply it in Add Money.' : 'Coupon created. Users can now apply it in Add Money for extra bonus.');
       await load();
@@ -121,7 +121,7 @@ export const ContentManagementView: React.FC = () => {
     if (!window.confirm(`Delete coupon ${c.code}? Users will no longer be able to use it.`)) return;
     const res = await fetch(`/api/admin/coupons/${c.id}`, { method: 'DELETE', headers: authHeaders });
     if (!res.ok) { setMessage('Coupon could not be deleted.'); return; }
-    if (editingCouponId === c.id) { setEditingCouponId(null); setCouponForm({ code: '', bonus_percent: '10', description: 'Add Money 10% Extra Bonus', max_uses: '0', expires_at: '', is_active: true }); }
+    if (editingCouponId === c.id) { setEditingCouponId(null); setCouponForm({ code: '', bonus_percent: '10', description: 'Extra BDT Bonus for Send Money & Add Money', max_uses: '0', expires_at: '', is_active: true }); }
     setMessage('Coupon deleted.');
     await load();
   };
@@ -189,8 +189,8 @@ export const ContentManagementView: React.FC = () => {
 
           {/* Add Money Coupon Codes - inside Voucher & Bonus Offers */}
           <div className="mt-8 pt-6 border-t-2 border-purple-100">
-            <div className="flex items-center gap-2 mb-3"><Ticket className="w-5 h-5 text-purple-600" /><h3 className="font-bold text-slate-900">Add Money Coupon Codes</h3><span className="ml-auto text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.5 rounded-full">{coupons.length} codes</span></div>
-            <p className="text-xs text-slate-500 mb-4">Create coupon codes for <span className="font-bold">Add Money & Send Money</span>. Example: <span className="font-mono font-bold text-purple-700">ADD10</span> with <span className="font-bold">10% Extra</span> → user enters BDT, payable foreign = BDT ÷ rate × (1 - 10%). Code is shown to users as offer and validated on both Add Money & Send Money.</p>
+            <div className="flex items-center gap-2 mb-3"><Ticket className="w-5 h-5 text-purple-600" /><h3 className="font-bold text-slate-900">Send Money Coupon Bonus (Extra BDT)</h3><span className="ml-auto text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.5 rounded-full">{coupons.length} codes</span></div>
+            <p className="text-xs text-slate-500 mb-4">Create coupon codes for <span className="font-bold">Add Money & Send Money</span>. Example: <span className="font-mono font-bold text-purple-700">ADD10</span> with <span className="font-bold">10% Extra</span> → user enters <span className="font-bold">5000 BDT</span>, bonus <span className="font-bold">+500 BDT</span>, total <span className="font-bold">5500 BDT</span> shown in box (payable foreign = base BDT ÷ rate, bonus added to total). Admin sets any % you want.</p>
             <form onSubmit={saveCoupon} className="space-y-3 bg-purple-50/50 border border-purple-100 rounded-xl p-4 mb-4">
               <div className="grid grid-cols-2 gap-3">
                 <input required className={inputClass} placeholder="Coupon code e.g. ADD10" value={couponForm.code} onChange={e => setCouponForm({ ...couponForm, code: e.target.value.toUpperCase() })} />
@@ -207,9 +207,9 @@ export const ContentManagementView: React.FC = () => {
               <label className="flex items-center gap-2 text-xs font-semibold text-slate-700"><input type="checkbox" checked={couponForm.is_active} onChange={e => setCouponForm({ ...couponForm, is_active: e.target.checked })} /> Active (users can apply)</label>
               <div className="flex gap-2">
                 <button disabled={savingCoupon} className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-60"><Ticket className="w-4 h-4" /> {savingCoupon ? 'Saving…' : editingCouponId ? 'Update coupon' : 'Create coupon (10% Extra)'}</button>
-                {editingCouponId && <button type="button" onClick={() => { setEditingCouponId(null); setCouponForm({ code: '', bonus_percent: '10', description: 'Add Money 10% Extra Bonus', max_uses: '0', expires_at: '', is_active: true }); }} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600"><X className="w-4 h-4" /></button>}
+                {editingCouponId && <button type="button" onClick={() => { setEditingCouponId(null); setCouponForm({ code: '', bonus_percent: '10', description: 'Extra BDT Bonus for Send Money & Add Money', max_uses: '0', expires_at: '', is_active: true }); }} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600"><X className="w-4 h-4" /></button>}
               </div>
-              <p className="text-[11px] text-purple-600 font-medium">💡 Tip: Creating coupon automatically publishes a visible Offer with same code so users see <span className="font-mono">ADD10</span> in Home offers carousel. Valid for both Add Money & Send Money.</p>
+              <p className="text-[11px] text-purple-600 font-medium">💡 Tip: Creating coupon automatically publishes a visible Offer with same code so users see <span className="font-mono">ADD10</span> in Home offers carousel. Valid for both Add Money & Send Money — <span className="font-bold">Admin sets any % (e.g. 5%, 12%, 20%) and it is added to total BDT shown in exchange box.</span></p>
             </form>
             <div className="space-y-2">
               {coupons.length === 0 ? <div className="text-xs text-slate-400 p-3 bg-slate-50 rounded-lg">No coupon codes yet. Create one e.g. <span className="font-mono font-bold">ADD10</span> for 10% extra.</div> : coupons.map(c => {

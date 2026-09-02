@@ -253,7 +253,7 @@ export const TransfersView: React.FC<TransfersViewProps> = ({
                         → ৳ {asNumber(tx.bdtAmount).toLocaleString()} BDT
                       </div>
                       {tx.couponCode && (
-                        <div className="text-[10px] font-mono text-purple-600">Coupon: {tx.couponCode} (-{tx.bonusPercent}%)</div>
+                        <div className="text-[10px] font-mono text-purple-600">Coupon: {tx.couponCode} (+{tx.bonusPercent}% → +৳{asNumber((tx as any).bonusBdt || 0).toLocaleString()} বোনাস)</div>
                       )}
                     </td>
                     <td className="py-3.5 px-4 font-mono text-blue-600 font-semibold">

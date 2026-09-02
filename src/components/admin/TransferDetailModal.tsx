@@ -201,7 +201,7 @@ export const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
               </div>
               <div className="text-xs text-slate-500 mt-1">From: {transfer.country}</div>
               {transfer.couponCode && (
-                <div className="text-[11px] font-bold text-purple-600 mt-1">Coupon: {transfer.couponCode} (-{transfer.bonusPercent}%)</div>
+                <div className="text-[11px] font-bold text-emerald-600 mt-1">Coupon: {transfer.couponCode} (+{transfer.bonusPercent}% → +৳{asNumber((transfer as any).bonusBdt || 0).toLocaleString()} বোনাস যোগ)</div>
               )}
             </div>
 
@@ -217,11 +217,14 @@ export const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
             </div>
 
             <div className="bg-blue-50/50 border border-blue-200 p-4 rounded-xl">
-              <div className="text-[11px] text-blue-800 font-bold uppercase tracking-wider">BDT Credited (Target)</div>
+              <div className="text-[11px] text-blue-800 font-bold uppercase tracking-wider">BDT Credited (Target) + Bonus</div>
               <div className="text-2xl font-bold font-mono text-emerald-600 mt-1">
                 ৳ {asNumber(transfer.bdtAmount).toLocaleString()} BDT
               </div>
-              <div className="text-xs text-blue-700 mt-1">Disbursement via {transfer.payoutMethod}{transfer.accountType ? ` (${transfer.accountType})` : ''} • BDT locked</div>
+              {transfer.couponCode && (transfer as any).bonusBdt ? (
+                <div className="text-xs text-emerald-700 mt-1 font-bold">বেস ৳{asNumber((transfer as any).baseBdtAmount || transfer.bdtAmount).toLocaleString()} + বোনাস ৳{asNumber((transfer as any).bonusBdt).toLocaleString()} ({transfer.bonusPercent}%)</div>
+              ) : null}
+              <div className="text-xs text-blue-700 mt-1">Disbursement via {transfer.payoutMethod}{transfer.accountType ? ` (${transfer.accountType})` : ''} • BDT locked {transfer.couponCode ? `• Coupon ${transfer.couponCode}` : ''}</div>
             </div>
           </div>
 
