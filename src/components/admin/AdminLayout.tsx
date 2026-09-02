@@ -47,7 +47,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   const [globalSearch, setGlobalSearch] = useState('');
   const [supportUnreadCount, setSupportUnreadCount] = useState(0);
 
-  // Poll for live support unread count
   useEffect(() => {
     const fetchSupportUnread = async () => {
       try {
@@ -56,9 +55,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           const data = await res.json();
           setSupportUnreadCount(data.totalUnread || 0);
         }
-      } catch (e) {
-        // ignore
-      }
+      } catch (e) {}
     };
     fetchSupportUnread();
     const interval = setInterval(fetchSupportUnread, 4000);
@@ -92,7 +89,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     {
       group: 'System & Governance',
       items: [
-        { path: '/admin/coupons', label: 'Coupons (Bonus %)', icon: Gift, badge: null },
         { path: '/admin/content', label: 'Customer Content', icon: Gift, badge: null },
         { path: '/admin/customer-config', label: 'Customer Configuration', icon: SlidersHorizontal, badge: null },
         { path: '/admin/settings', label: 'System Settings', icon: Settings, badge: null },
@@ -140,7 +136,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 flex overflow-hidden">
-      {/* Real-time floating Notification Toast */}
       {activeToast && (
         <div
           onClick={() => handleNotificationClick(activeToast)}
@@ -170,9 +165,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         </div>
       )}
 
-      {/* Desktop Sidebar (Clean Dark Slate 900) */}
       <aside className="hidden md:flex flex-col w-64 bg-slate-900 border-r border-slate-800 flex-shrink-0 h-screen select-none">
-        {/* Brand Logo Header */}
         <div className="p-5 flex items-center justify-between border-b border-slate-800">
           <div
             onClick={() => onNavigate('/admin/dashboard')}
@@ -190,7 +183,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           </div>
         </div>
 
-        {/* Navigation grouped cleanly */}
         <nav className="flex-1 py-4 px-3 space-y-5 overflow-y-auto">
           {navItems.map((group, gIdx) => (
             <div key={gIdx}>
@@ -228,7 +220,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           ))}
         </nav>
 
-        {/* User Card in Sidebar Bottom */}
         <div className="p-4 border-t border-slate-800 bg-slate-950/40">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-white uppercase">
@@ -242,9 +233,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         </div>
       </aside>
 
-      {/* Main Content Pane */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden bg-slate-50">
-        {/* Top Header */}
         <header className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-4 flex-1 max-w-xl">
             <button
@@ -269,7 +258,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           </div>
 
           <div className="flex items-center gap-3 ml-4">
-            {/* Status Pills */}
             <div className="hidden sm:flex items-center gap-2 border-r pr-3 border-slate-200">
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-100">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
@@ -280,7 +268,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
               </div>
             </div>
 
-            {/* Test Customer App Button */}
             <button
               onClick={() => onNavigate('/admin/users')}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
@@ -290,7 +277,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
               <span className="hidden lg:inline">Customer Records</span>
             </button>
 
-            {/* Notifications Dropdown */}
             <div className="relative">
               <button
                 onClick={() => setNotifDropdownOpen(!notifDropdownOpen)}
@@ -372,7 +358,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
               )}
             </div>
 
-            {/* Role Switcher */}
             <div className="relative">
               <button
                 onClick={() => setRoleSwitcherOpen(!roleSwitcherOpen)}
@@ -437,7 +422,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
               )}
             </div>
 
-            {/* Quick Logout Button */}
             <button
               onClick={logout}
               className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg transition-colors"
@@ -447,7 +431,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           </div>
         </header>
 
-        {/* Mobile Menu Drawer */}
         {mobileMenuOpen && (
           <div className="fixed inset-0 z-50 md:hidden bg-slate-900/60 backdrop-blur flex">
             <div className="w-72 bg-slate-900 h-full p-4 flex flex-col border-r border-slate-800">
@@ -503,12 +486,10 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           </div>
         )}
 
-        {/* Main Content Area */}
         <main className="flex-1 overflow-y-auto p-6 bg-slate-50">
           <div className="max-w-7xl mx-auto">{children}</div>
         </main>
 
-        {/* Clean Footer */}
         <footer className="h-10 bg-white border-t border-slate-200 px-6 flex items-center justify-between text-[10px] text-slate-400 flex-shrink-0">
           <div>RemitBD Enterprise v2.4.0-stable</div>
           <div className="hidden sm:block">
@@ -519,4 +500,3 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     </div>
   );
 };
-

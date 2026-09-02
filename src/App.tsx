@@ -15,7 +15,6 @@ import { FundingAccountsView } from './components/admin/FundingAccountsView';
 import { CustomerConfigView } from './components/admin/CustomerConfigView';
 import { AdminViewErrorBoundary } from './components/admin/AdminViewErrorBoundary';
 import { UsdtSellView } from './components/admin/UsdtSellView';
-import { CouponManagementView } from './components/admin/CouponManagementView';
 
 const AppContent: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -49,7 +48,6 @@ const AppContent: React.FC = () => {
     );
   }
 
-  // If not authenticated, render login gateway
   if (!isAuthenticated) {
     return <AdminLogin onSuccess={() => setCurrentPath('/admin/dashboard')} />;
   }
@@ -100,8 +98,6 @@ const AppContent: React.FC = () => {
         return <FundingAccountsView />;
       case '/admin/usdt-sells':
         return <UsdtSellView />;
-      case '/admin/coupons':
-        return <CouponManagementView />;
       default:
         return (
           <DashboardView
